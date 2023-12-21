@@ -3,9 +3,10 @@
 # 展示
 ![img.png](./img.png)
 
-测试地址
-https://goerli.etherscan.io/tx/0xa7d4962386b3813596fefb81e16fe8eaec21f1589ebd0b573bf6757b118cfdf5
+
 # 使用方法
+安装rust
+
 1,下载本项目,自行编译或者运行别人编译好的版本
 ```
 # 如果安装过rust 可以输入命令(务必设置好.env文件内容)

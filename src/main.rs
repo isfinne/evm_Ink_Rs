@@ -13,6 +13,7 @@ use log::{error, info, warn};
 use serde::Deserialize;
 use tokio;
 use url::Url;
+use ethers::types::U256;
 
 use crate::initialization::{log_banner, print_banner, setup_logger};
 
@@ -219,6 +220,7 @@ async fn mint(provider: &BatchRequestMiddleware<Provider<Http>>, wallet: &Wallet
         let current_batch_size = end - start; // 计算当前批次的实际大小
         log_banner(format!("第 {} 轮,共 {} 轮 当前批次大小 {}", i + 1, batch_count, current_batch_size));
         let mut batch = BatchRequest::with_capacity(current_batch_size as usize);
+        let value: U256 = parse_units("0.1", 18).unwrap().into(); // 转移的MATIC数量为0.1 MATIC
         for _ in start..end {
             let data = config.get_hex_text();
             //println!("data: {}", data);
@@ -229,7 +231,7 @@ async fn mint(provider: &BatchRequestMiddleware<Provider<Http>>, wallet: &Wallet
                     .chain_id(chain_id)
                     .from(wallet.address())
                     .to(to_address)
-                    .value(0)
+                    .value(value)
                     .max_fee_per_gas(gas_price.max_fee_per_gas)
                     .max_priority_fee_per_gas(gas_price.max_priority_fee_per_gas)
                     .gas(config.gas_limit)
@@ -242,7 +244,7 @@ async fn mint(provider: &BatchRequestMiddleware<Provider<Http>>, wallet: &Wallet
                     .chain_id(chain_id)
                     .from(wallet.address())
                     .to(to_address)
-                    .value(0)
+                    .value(value)
                     .nonce(nonce)
                     .data(data)
                     .gas(config.gas_limit)
@@ -272,6 +274,8 @@ async fn mint(provider: &BatchRequestMiddleware<Provider<Http>>, wallet: &Wallet
             }
             count += 1;
         }
+        info!("等待 5 秒进入下一轮");
+        tokio::time::sleep(Duration::new(5, 0)).await;
     }
     Ok(true)
 }
